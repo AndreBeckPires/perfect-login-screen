@@ -1,7 +1,11 @@
 import * as THREE from "three";
 import Nebula, { SpriteRenderer } from "three-nebula";
+import BaseRenderer from "three-nebula";
+
 import { loaderFBX } from "../utils/loader";
 import fire from "../nebula/fire.json";
+import portal from "../nebula/portal.json";
+
 import Camera from "./camera";
 import Light from "./light";
 
@@ -60,7 +64,6 @@ export default class CastleScene extends THREE.Scene {
 
         Nebula.fromJSONAsync(fire, THREE).then(loaded => {
             loaded.emitters.forEach(emitter => {
-                console.log(emitter);
                 emitter.position.y = 26;
                 emitter.position.x = 56;
                 emitter.rotation.x = -120
@@ -69,7 +72,19 @@ export default class CastleScene extends THREE.Scene {
             const nebula = loaded.addRenderer(nebulaRenderer);
             this.particles.push(nebula);
         });
+
+        Nebula.fromJSONAsync(portal, THREE).then(loaded => {
+            loaded.emitters.forEach(emitter => {
+                emitter.position.x = -5
+                emitter.position.y = 12
+
+            })
+            const nebulaRenderer = new SpriteRenderer(this, THREE)
+            const nebula = loaded.addRenderer(nebulaRenderer);
+            this.particles.push(nebula);
+        });
     }
+
 
     async createObjects() {
         const fbx = await loaderFBX('assets/dungeon.fbx')
@@ -93,6 +108,7 @@ export default class CastleScene extends THREE.Scene {
         this.renderer.render(this, this.camera);
 
         this.particles.forEach(particle => particle.update())
+
     }
 
     onWindowResize() {
